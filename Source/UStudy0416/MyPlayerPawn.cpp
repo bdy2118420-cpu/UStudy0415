@@ -11,6 +11,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "MyPropellerComponent.h"
 #include "MyRocket.h"
+#include "EnhancedInputComponent.h"
+
+
+
 // Sets default values
 AMyPlayerPawn::AMyPlayerPawn()
 {
@@ -62,6 +66,11 @@ AMyPlayerPawn::AMyPlayerPawn()
 	Movement->Acceleration = 200.f;	
 	Movement->Deceleration = 200.f;
 
+	static ConstructorHelpers::FClassFinder<AMyRocket> BP_Rocket(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_Rocket.BP_Rocket_C'"));
+	if (BP_Rocket.Succeeded())
+	{
+		RocketTemplate = BP_Rocket.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -83,35 +92,44 @@ void AMyPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Pitch"), this, &AMyPlayerPawn::Pitch);
+	/*PlayerInputComponent->BindAxis(TEXT("Pitch"), this, &AMyPlayerPawn::Pitch);
 	PlayerInputComponent->BindAxis(TEXT("Roll"), this, &AMyPlayerPawn::Roll);
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AMyPlayerPawn::Fire);
 	PlayerInputComponent->BindAction(TEXT("Boost"), IE_Pressed, this, &AMyPlayerPawn::Bost);
-	PlayerInputComponent->BindAction(TEXT("Boost"), IE_Released, this, &AMyPlayerPawn::UnBost);
+	PlayerInputComponent->BindAction(TEXT("Boost"), IE_Released, this, &AMyPlayerPawn::UnBost);*/
+	UEnhancedInputComponent* UIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (UIC)
+	{
+		UIC->BindAction(IA_Rotate, ETriggerEvent::Triggered, this, &AMyPlayerPawn::Rotate);
+		UIC->BindAction(IA_Fire, ETriggerEvent::Triggered, this, &AMyPlayerPawn::Fire);
+		UIC->BindAction(IA_Boost, ETriggerEvent::Triggered, this, &AMyPlayerPawn::Boost);
+		UIC->BindAction(IA_Boost, ETriggerEvent::Completed, this, &AMyPlayerPawn::Unboost);
+
+	}
 }
 
-void AMyPlayerPawn::Pitch(float Value)
+void AMyPlayerPawn::Rotate(const FInputActionValue& Value)
 {
-	AddActorLocalRotation(FRotator(RotateSpeed * Value * UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), 0, 0));
+	FVector2D Rot = Value.Get<FVector2D>();
+	Rot = Rot * UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) * 60.0f;
+
+	AddActorLocalRotation(FRotator(Rot.Y, 0, Rot.X));
 }
 
-void AMyPlayerPawn::Roll(float Value)
+void AMyPlayerPawn::Fire(const FInputActionValue& Value)
 {
-	AddActorLocalRotation(FRotator(0, 0, RotateSpeed * Value * UGameplayStatics::GetWorldDeltaSeconds(GetWorld())));
+	GetWorld()->SpawnActor<AMyRocket>(RocketTemplate, Arrow->K2_GetComponentToWorld());
 }
 
-void AMyPlayerPawn::Fire()
+void AMyPlayerPawn::Boost(const FInputActionValue& Value)
 {
-	GetWorld()->SpawnActor<AMyRocket>(Arrow->GetComponentLocation(), Arrow->GetComponentRotation());
+	Movement->MaxSpeed = 500.0f;
 }
 
-void AMyPlayerPawn::Bost()
-{
-	Movement->MaxSpeed = BoostSpeed;
-}
-
-void AMyPlayerPawn::UnBost()
+void AMyPlayerPawn::Unboost(const FInputActionValue& Value)
 {
 	Movement->MaxSpeed = MoveSpeed;
 }
+
+
 

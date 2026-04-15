@@ -2,8 +2,31 @@
 
 
 #include "MyPlayerController.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 
 AMyPlayerController::AMyPlayerController()
 {
 
+}
+
+void AMyPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	if (!IsLocalPlayerController())
+	{
+		return;
+	}
+
+	if(ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (InputMapping)
+			{
+				InputSystem->AddMappingContext(InputMapping, 0);
+			}
+		
+		}
+	}
 }

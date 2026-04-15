@@ -9,11 +9,18 @@
 /**
  * 
  */
+class UInputMappingContext;
+
+
 UCLASS()
 class USTUDY0416_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
 	AMyPlayerController();
-	
+
+	virtual void OnPossess(APawn* aPawn) override;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputMappingContext> InputMapping;
 };

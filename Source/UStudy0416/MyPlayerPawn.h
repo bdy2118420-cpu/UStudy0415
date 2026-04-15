@@ -4,8 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include <EnhancedInputLibrary.h>
+
+#include "InputAction.h"
 #include "MyPlayerPawn.generated.h"
 
+class AMyRocket;
+class UInputAction;
 class UBoxComponent;
 class UStaticMeshComponent;
 class UCameraComponent;
@@ -30,7 +35,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -62,21 +67,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
 	TObjectPtr<UFloatingPawnMovement> Movement;
 
-	void Pitch(float Value);
+	void Rotate(const FInputActionValue& Value);
 
-	void Roll(float Value);
+	void Fire(const FInputActionValue& Value);
 
-	void Fire();
+	void Boost(const FInputActionValue& Value);
 
-	void Bost();
+	void Unboost(const FInputActionValue& Value);
 
-	void UnBost();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Data)
 	float MoveSpeed = 100.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Data)
-	float RotateSpeed = 60.f;
+	float RotateSpeed = 120.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Data)
 	float BoostSpeed = 500.f;
@@ -84,5 +88,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Data)
 	float PropellerRotate = 3600.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Rotate;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Fire;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Boost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TSubclassOf<AMyRocket> RocketTemplate;
 };
