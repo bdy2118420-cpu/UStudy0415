@@ -12,7 +12,7 @@ AMyRocket::AMyRocket()
 	PrimaryActorTick.bCanEverTick = true;
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = CollisionBox;
-	CollisionBox->SetBoxExtent(FVector(12.214396f, 4.717534f, 4.172323f));
+	CollisionBox->SetBoxExtent(FVector(12.2f, 4.7f, 4.1f));
 
 	RocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Rocket"));
 	RocketMesh->SetupAttachment(CollisionBox);

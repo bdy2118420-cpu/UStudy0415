@@ -38,12 +38,7 @@ AMyPlayerPawn::AMyPlayerPawn()
 	Right = CreateDefaultSubobject<UMyPropellerComponent>(TEXT("Right"));
 	Right->SetupAttachment(Body);
 
-	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> Set_Propeller(TEXT("/Script/Engine.StaticMesh'/Game/P38/Meshes/SM_P38_Propeller.SM_P38_Propeller'"));
-	if (Set_Propeller.Succeeded())
-	{
-		Left->SetStaticMesh(Set_Propeller.Object);
-		Right->SetStaticMesh(Set_Propeller.Object);
-	}*/
+	
 	Left->SetRelativeLocation(FVector(37.000000f, 21.000000f, 0.000000f));
 	Right->SetRelativeLocation(FVector(37.000000f, -21.000000f, 0.000000f));
 
@@ -53,6 +48,7 @@ AMyPlayerPawn::AMyPlayerPawn()
 	SpringArm->SocketOffset = FVector(0, 0, 40.f);
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->bEnableCameraRotationLag = true;
+	SpringArm->CameraLagSpeed = 5.f;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
@@ -63,6 +59,8 @@ AMyPlayerPawn::AMyPlayerPawn()
 
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 	Movement->MaxSpeed = MoveSpeed;
+	Movement->Acceleration = 200.f;	
+	Movement->Deceleration = 200.f;
 
 }
 
